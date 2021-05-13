@@ -1,6 +1,6 @@
 package com.dscatalog.controller;
 
-import com.dscatalog.model.Category;
+import com.dscatalog.dto.CategoryDTO;
 import com.dscatalog.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +18,8 @@ public class CategoryController {
     private CategoryService service;
 
     @GetMapping
-    public ResponseEntity<List<Category>> getCategories() {
-        List<Category> categories = service.findAll();
+    public ResponseEntity<List<CategoryDTO>> getCategories() {
+        List<CategoryDTO> categories = service.findAll();
         if (categories.isEmpty())
             return ResponseEntity.noContent().build();
 
