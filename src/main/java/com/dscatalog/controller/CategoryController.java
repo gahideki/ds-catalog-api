@@ -29,12 +29,8 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDTO> findById(@PathVariable Long id) {
-        try {
-            CategoryDTO categoryDTO = service.findById(id);
-            return ResponseEntity.ok(categoryDTO);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        CategoryDTO categoryDTO = service.findById(id);
+        return ResponseEntity.ok(categoryDTO);
     }
 
 }
