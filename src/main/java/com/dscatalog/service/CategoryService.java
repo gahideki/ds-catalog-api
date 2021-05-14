@@ -22,4 +22,9 @@ public class CategoryService {
         return categories.stream().map(category -> new CategoryDTO(category)).collect(Collectors.toList());
     }
 
+    public CategoryDTO findById(Long id) {
+        Category category = repository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
+        return new CategoryDTO(category);
+    }
+
 }
