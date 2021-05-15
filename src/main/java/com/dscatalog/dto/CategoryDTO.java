@@ -7,6 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class CategoryDTO {
 
     private Long id;
