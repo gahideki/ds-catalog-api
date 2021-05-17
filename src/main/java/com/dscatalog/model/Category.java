@@ -1,8 +1,11 @@
 package com.dscatalog.model;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -19,6 +22,14 @@ public class Category {
     private Long id;
 
     private String name;
+
+    @CreationTimestamp
+    @Column(columnDefinition = "datetime")
+    private OffsetDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(columnDefinition = "datetime")
+    private OffsetDateTime updateAt;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
