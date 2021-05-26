@@ -33,7 +33,4 @@ public class Category {
     @Column(columnDefinition = "datetime")
     private OffsetDateTime updateAt;
 
-    @ManyToMany(mappedBy = "categories")
-    private Set<Product> products = new HashSet<>();
-
 }

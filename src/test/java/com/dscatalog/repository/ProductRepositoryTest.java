@@ -1,5 +1,6 @@
 package com.dscatalog.repository;
 
+import com.dscatalog.mock.MockUtils;
 import com.dscatalog.model.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,8 +10,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class ProductRepositoryTest {
@@ -20,11 +20,13 @@ class ProductRepositoryTest {
 
     private Long existingId;
     private Long nonExistingId;
+    private Long countTotalProducts;
 
     @BeforeEach
     public void setup() {
         existingId = 1L;
         nonExistingId = 1000L;
+        countTotalProducts = 25L;
     }
 
     @Test
@@ -42,5 +44,16 @@ class ProductRepositoryTest {
             productRepository.deleteById(nonExistingId);
         });
     }
+
+    @Test
+    public void saveShouldPersistWithAutoIncrementWhenIdIsNull() {
+        Product product = MockUtils.createProduct();
+        product.setId(null);
+
+        product = productRepository.save(product);
+        assertNotNull(product.getId());
+        assertEquals(countTotalProducts + 1, product.getId());
+    }
+
 
 }
