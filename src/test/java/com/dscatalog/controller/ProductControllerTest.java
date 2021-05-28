@@ -2,6 +2,7 @@ package com.dscatalog.controller;
 
 import com.dscatalog.dto.ProductDTO;
 import com.dscatalog.service.ProductService;
+import com.dscatalog.service.exception.DatabaseException;
 import com.dscatalog.service.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ import java.util.List;
 import static com.dscatalog.mock.MockUtils.createProductDTO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -38,6 +39,7 @@ public class ProductControllerTest {
 
     private Long existingId;
     private Long nonExistingId;
+    private Long dependentId;
     private ProductDTO productDTO;
     private PageImpl<ProductDTO> productPage;
 
@@ -45,6 +47,7 @@ public class ProductControllerTest {
     public void setup() {
         existingId = 1L;
         nonExistingId = 2L;
+        dependentId = 3L;
         productDTO = createProductDTO();
         productPage = new PageImpl<>(List.of(productDTO));
 
@@ -54,6 +57,10 @@ public class ProductControllerTest {
 
         when(productService.update(eq(existingId), any())).thenReturn(productDTO);
         when(productService.update(eq(nonExistingId), any())).thenThrow(ResourceNotFoundException.class);
+
+        doNothing().when(productService).delete(existingId);
+        doThrow(ResourceNotFoundException.class).when(productService).delete(nonExistingId);
+        doThrow(DatabaseException.class).when(productService).delete(dependentId);
     }
 
     @Test
