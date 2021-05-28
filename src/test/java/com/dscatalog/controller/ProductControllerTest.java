@@ -20,8 +20,7 @@ import static com.dscatalog.mock.MockUtils.createProductDTO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -61,6 +60,34 @@ public class ProductControllerTest {
         doNothing().when(productService).delete(existingId);
         doThrow(ResourceNotFoundException.class).when(productService).delete(nonExistingId);
         doThrow(DatabaseException.class).when(productService).delete(dependentId);
+
+        when(productService.save(any())).thenReturn(productDTO);
+    }
+
+    @Test
+    public void insertShouldReturnProductDTOCreated() throws Exception {
+        String jsonBody = mapper.writeValueAsString(productDTO);
+
+        mockMvc.perform(post("/products", existingId)
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").exists())
+                .andExpect(jsonPath("$.description").exists());
+    }
+
+    @Test
+    public void deleteShouldNoContentWhenIdExists() throws Exception {
+        mockMvc.perform(delete("/products/{id}", nonExistingId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteShouldReturnNotFoundWhenIdDoesNotExist() throws Exception {
+        mockMvc.perform(delete("/products/{id}", existingId))
+                .andExpect(status().isNoContent());
     }
 
     @Test
