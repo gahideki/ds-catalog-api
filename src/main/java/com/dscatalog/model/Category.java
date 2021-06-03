@@ -6,8 +6,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -32,8 +30,5 @@ public class Category {
     @UpdateTimestamp
     @Column(columnDefinition = "datetime")
     private OffsetDateTime updateAt;
-
-    @ManyToMany(mappedBy = "categories")
-    private Set<Product> products = new HashSet<>();
 
 }
