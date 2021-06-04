@@ -1,6 +1,7 @@
 package com.dscatalog.service;
 
 import com.dscatalog.dto.UserDTO;
+import com.dscatalog.dto.UserInsertDTO;
 import com.dscatalog.model.Role;
 import com.dscatalog.model.User;
 import com.dscatalog.repository.RoleRepository;
@@ -12,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,9 @@ public class UserService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
 
     @Transactional(readOnly = true)
@@ -40,9 +45,13 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO save(UserDTO userDTO) {
+    public UserDTO save(UserInsertDTO userInsertDTO) {
         User user = new User();
-        copyDtoToEntity(userDTO , user);
+        copyDtoToEntity(userInsertDTO , user);
+
+        String password = passwordEncoder.encode(userInsertDTO.getPassword());
+        user.setPassword(password);
+
         user = userRepository.save(user);
         return new UserDTO(user);
     }
