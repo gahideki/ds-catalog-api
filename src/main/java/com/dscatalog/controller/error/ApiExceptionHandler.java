@@ -4,6 +4,7 @@ import com.dscatalog.service.exception.DatabaseException;
 import com.dscatalog.service.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -34,6 +35,19 @@ public class ApiExceptionHandler {
         standardError.setStatus(badRequest.value());
         standardError.setTimestamp(LocalDateTime.now());
         standardError.setError("Database exception");
+        standardError.setMessage(ex.getMessage());
+        standardError.setPath(request.getRequestURI());
+        return ResponseEntity.status(badRequest).body(standardError);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<StandardError> validation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        HttpStatus badRequest = HttpStatus.UNPROCESSABLE_ENTITY;
+
+        StandardError standardError = new StandardError();
+        standardError.setStatus(badRequest.value());
+        standardError.setTimestamp(LocalDateTime.now());
+        standardError.setError("Validation exception");
         standardError.setMessage(ex.getMessage());
         standardError.setPath(request.getRequestURI());
         return ResponseEntity.status(badRequest).body(standardError);
