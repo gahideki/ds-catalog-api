@@ -41,16 +41,21 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<StandardError> validation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<ValidationError> validation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         HttpStatus badRequest = HttpStatus.UNPROCESSABLE_ENTITY;
 
-        StandardError standardError = new StandardError();
-        standardError.setStatus(badRequest.value());
-        standardError.setTimestamp(LocalDateTime.now());
-        standardError.setError("Validation exception");
-        standardError.setMessage(ex.getMessage());
-        standardError.setPath(request.getRequestURI());
-        return ResponseEntity.status(badRequest).body(standardError);
+        ValidationError validationError = new ValidationError();
+        validationError.setStatus(badRequest.value());
+        validationError.setTimestamp(LocalDateTime.now());
+        validationError.setError("Validation exception");
+        validationError.setMessage(ex.getMessage());
+        validationError.setPath(request.getRequestURI());
+
+        ex.getBindingResult().getFieldErrors().forEach(field -> {
+            validationError.addError(field.getField(), field.getDefaultMessage());
+        });
+
+        return ResponseEntity.status(badRequest).body(validationError);
     }
 
 }
