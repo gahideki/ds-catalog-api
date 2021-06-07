@@ -2,6 +2,7 @@ package com.dscatalog.service;
 
 import com.dscatalog.dto.UserDTO;
 import com.dscatalog.dto.UserInsertDTO;
+import com.dscatalog.dto.UserUpdateDTO;
 import com.dscatalog.model.Role;
 import com.dscatalog.model.User;
 import com.dscatalog.repository.RoleRepository;
@@ -57,10 +58,10 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO update(Long id, UserDTO userInput) {
+    public UserDTO update(Long id, UserUpdateDTO userUpdateDTO) {
         try {
             User user = userRepository.getOne(id);
-            copyDtoToEntity(userInput, user);
+            copyDtoToEntity(userUpdateDTO, user);
             return new UserDTO(user);
         } catch (EntityNotFoundException ex) {
             throw new ResourceNotFoundException(String.format("Id %d not found", id));
