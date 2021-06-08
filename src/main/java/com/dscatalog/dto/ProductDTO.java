@@ -7,6 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -20,10 +24,19 @@ import java.util.stream.Collectors;
 public class ProductDTO {
 
     private Long id;
+
+    @Size(min = 5, max = 60, message = "Deve ter entre 5 e 60 caracteres")
+    @NotBlank(message = "Campo obrigatório")
     private String name;
+
     private String description;
+
+    @Positive(message = "Preço deve ser um valor positivo")
     private BigDecimal price;
+
     private String imgUrl;
+
+    @PastOrPresent(message = "Data do produto não poder futura")
     private OffsetDateTime date;
 
     private Set<CategoryDTO> categories = new HashSet<>();
