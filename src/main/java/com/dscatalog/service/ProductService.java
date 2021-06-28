@@ -28,9 +28,9 @@ public class ProductService {
     private CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public Page<ProductDTO> findAllPaged(Pageable pageable, Long categoryId) {
+    public Page<ProductDTO> findAllPaged(Pageable pageable, Long categoryId, String name) {
         Category category = (categoryId == 0) ? null : categoryRepository.getOne(categoryId);
-        Page<Product> products = productRepository.search(pageable, category);
+        Page<Product> products = productRepository.search(pageable, category, name);
         productRepository.findProductsCategories(products.stream().collect(Collectors.toList()));
         return products.map(p -> new ProductDTO(p, p.getCategories()));
     }

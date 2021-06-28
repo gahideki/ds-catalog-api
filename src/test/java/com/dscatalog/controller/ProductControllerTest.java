@@ -62,7 +62,7 @@ public class ProductControllerTest {
         username = "maria@gmail.com";
         password = "123456";
 
-        when(productService.findAllPaged(any(), any())).thenReturn(productPage);
+        when(productService.findAllPaged(any(), any(), any())).thenReturn(productPage);
         when(productService.findById(existingId)).thenReturn(productDTO);
         when(productService.findById(nonExistingId)).thenThrow(ResourceNotFoundException.class);
 

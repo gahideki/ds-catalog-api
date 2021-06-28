@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 @Transactional
@@ -51,7 +52,7 @@ public class ProductServiceIntegrationTest {
     @Test
     public void findAllPagedShouldReturnPageWhenPage0Size10() {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<ProductDTO> result = productService.findAllPaged(pageRequest, 0L);
+        Page<ProductDTO> result = productService.findAllPaged(pageRequest, 0L, any());
 
         assertFalse(result.isEmpty());
         assertEquals(0, result.getNumber());
@@ -62,7 +63,7 @@ public class ProductServiceIntegrationTest {
     @Test
     public void findAllPagedShouldReturnEmptyPageWhenPageDoesNotExist() {
         PageRequest pageRequest = PageRequest.of(50, 10);
-        Page<ProductDTO> result = productService.findAllPaged(pageRequest, 0L);
+        Page<ProductDTO> result = productService.findAllPaged(pageRequest, 0L, any());
 
         assertTrue(result.isEmpty());
     }
@@ -70,7 +71,7 @@ public class ProductServiceIntegrationTest {
     @Test
     public void findAllPagedShouldReturnOrderedPageWhenSortByName() {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("name"));
-        Page<ProductDTO> result = productService.findAllPaged(pageRequest, 0L);
+        Page<ProductDTO> result = productService.findAllPaged(pageRequest, 0L, any());
 
         assertFalse(result.isEmpty());
         assertEquals("Macbook Pro", result.getContent().get(0).getName());
