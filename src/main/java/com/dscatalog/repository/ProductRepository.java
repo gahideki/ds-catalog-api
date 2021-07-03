@@ -13,9 +13,10 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT DISTINCT prod FROM Product prod INNER JOIN prod.categories cats WHERE (:category IS NULL OR :category IN cats) " +
+    @Query("SELECT DISTINCT prod FROM Product prod INNER JOIN prod.categories cats " +
+            "WHERE (COALESCE(:categories) IS NULL OR cats IN :categories) " +
             "AND (LOWER(prod.name) LIKE LOWER(CONCAT('%', :name, '%')))")
-    Page<Product> search(Pageable pageable, Category category, String name);
+    Page<Product> search(Pageable pageable, List<Category> categories, String name);
 
     @Query("SELECT prod FROM Product prod JOIN FETCH prod.categories WHERE prod IN :products")
     List<Product> findProductsCategories(List<Product> products);
