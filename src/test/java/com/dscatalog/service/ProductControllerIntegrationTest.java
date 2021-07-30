@@ -1,6 +1,7 @@
 package com.dscatalog.service;
 
 import com.dscatalog.dto.ProductDTO;
+import com.dscatalog.util.TokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,16 +29,23 @@ public class ProductControllerIntegrationTest {
     @Autowired
     private ObjectMapper mapper;
 
+    @Autowired
+    private TokenUtil tokenUtil;
+
     private Long existingId;
     private Long nonExistingId;
     private Long countTotalProducts;
     private ProductDTO productDTO;
+    private String username;
+    private String password;
 
     @BeforeEach
     public void setup() {
         existingId = 1L;
         nonExistingId = 1000L;
         countTotalProducts = 25L;
+        username = "maria@gmail.com";
+        password = "123456";
 
         productDTO = createProductDTO();
     }
@@ -56,12 +64,14 @@ public class ProductControllerIntegrationTest {
 
     @Test
     public void updateShouldReturnProductDTOWhenIdExists() throws Exception {
-        String jsonBody = mapper.writeValueAsString(productDTO);
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
 
+        String jsonBody = mapper.writeValueAsString(productDTO);
         String expectedName = productDTO.getName();
         String expectedDescription = productDTO.getDescription();
 
         mockMvc.perform(put("/products/{id}", existingId)
+                .header("Authorization", "Bearer " + accessToken)
                 .content(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -73,9 +83,11 @@ public class ProductControllerIntegrationTest {
 
     @Test
     public void updateShouldReturnNotFoundWhenIdDoesNotExist() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
         String jsonBody = mapper.writeValueAsString(productDTO);
 
         mockMvc.perform(put("/products/{id}", nonExistingId)
+                .header("Authorization", "Bearer " + accessToken)
                 .content(jsonBody)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))

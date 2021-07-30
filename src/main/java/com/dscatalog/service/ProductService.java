@@ -16,25 +16,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Arrays;
 
 @Service
 public class ProductService {
 
     @Autowired
-    private ProductRepository repository;
+    private ProductRepository productRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public Page<ProductDTO> findAllPaged(Pageable pageable) {
-        Page<Product> products = repository.findAll(pageable);
+    public Page<ProductDTO> findAllPaged(Pageable pageable, Long categoryId, String name) {
+        Category category = (categoryId == 0) ? null : categoryRepository.getOne(categoryId);
+        Page<Product> products = productRepository.search(pageable, Arrays.asList(category), name);
+        productRepository.findProductsCategories(products.getContent());
         return products.map(p -> new ProductDTO(p, p.getCategories()));
     }
 
     @Transactional(readOnly = true)
     public ProductDTO findById(Long id) {
-        Product product = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return new ProductDTO(product, product.getCategories());
     }
 
@@ -42,14 +45,14 @@ public class ProductService {
     public ProductDTO save(ProductDTO productDTO) {
         Product product = new Product();
         copyDtoToEntity(productDTO, product);
-        product = repository.save(product);
+        product = productRepository.save(product);
         return new ProductDTO(product);
     }
 
     @Transactional
     public ProductDTO update(Long id, ProductDTO productInput) {
         try {
-            Product product = repository.getOne(id);
+            Product product = productRepository.getOne(id);
             copyDtoToEntity(productInput, product);
             return new ProductDTO(product);
         } catch (EntityNotFoundException ex) {
@@ -60,7 +63,7 @@ public class ProductService {
     @Transactional
     public void delete(Long id) {
         try {
-            repository.deleteById(id);
+            productRepository.deleteById(id);
         } catch (EmptyResultDataAccessException ex) {
             throw new ResourceNotFoundException(String.format("Id %d not found", id));
         } catch (DataIntegrityViolationException ex) {
